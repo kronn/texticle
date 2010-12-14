@@ -72,9 +72,10 @@ module Texticle
         lex =~ /(.+)\*\s*$/ ? "#{$1}:*" : lex
       end.join(' & ')
 
+      ts_rank = "ts_rank_cd((#{this_index.to_s}), to_tsquery(#{connection.quote(dictionary)}, #{connection.quote(term)}))"
+
       {
-        :select => "#{table_name}.*, ts_rank_cd((#{this_index.to_s}),
-          to_tsquery(#{connection.quote(dictionary)}, #{connection.quote(term)})) as rank",
+        :select => "#{table_name}.*, #{ts_rank} as rank",
         :conditions =>
           ["#{this_index.to_s} @@ to_tsquery(?,?)", dictionary, term],
         :order => 'rank DESC'
